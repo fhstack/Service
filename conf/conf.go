@@ -12,4 +12,5 @@ const (
 	GeneratedProgramName string = "main"
 	RunPath              string = "/home/fh/goWorkspace/src/github.com/l-f-h/Service/inline/Run"
 	ComparePath          string = "/home/fh/goWorkspace/src/github.com/l-f-h/Service/inline/Compare"
+	CallBackContentType  string = "application/x-www-form-urlencoded"
 )

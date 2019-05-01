@@ -13,8 +13,6 @@ void SetResourceLimit() {
     lim.rlim_cur = C_LIM;
     lim.rlim_max = C_LIM + 1;
     setrlimit(RLIMIT_CPU, &lim);
-    alarm(0);
-    alarm(C_LIM * 3);
     //file
     lim.rlim_cur = F_LIM;
     lim.rlim_max = F_LIM + ONEMB;
@@ -52,11 +50,16 @@ int SetChildRunEnv() {
 
 
 void Child(int rpip) {
-    if(SetChildRunEnv() != 0) //TODO tell parent by pip
+    //min privileges model
+    //1024 is the id of user "judge"
+    //current proc user is not the user "judge"
+    //so the "judge" just has some base privileges
+    while(setuid(1024) != 0)
+        ;
+    if(SetChildRunEnv() != 0)
         return;
     if(DEBUG)
         fprintf(stderr,"####SetChildRunEnv is successful\nalready to execl\n");
-    
     if(ptrace(PTRACE_TRACEME, 0, NULL, NULL) != 0) {
         return;
     }

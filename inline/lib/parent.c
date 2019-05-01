@@ -109,7 +109,7 @@ void WatchChild(pid_t c_pid) {
         if(WIFSIGNALED(status)) {
             sig = WTERMSIG(status);
             if(DEBUG)
-                printf("user exit by sixnal: %d", sig);
+                printf("user exit by signal: %d", sig);
             switch(sig) {
             case SIGCHLD:
             case SIGXCPU:

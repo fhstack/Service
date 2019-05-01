@@ -23,27 +23,38 @@ var LanguageToCompileArgs = map[string]string{
 	"cpp": "g++ -o",
 }
 
-func (compiler *Compiler) createSourceCodeFile(CompleteSourceCodeName string) error {
+func (compiler *Compiler) createSourceCodeFileAndOutDataFile(CompleteSourceCodeName string) error {
 	//user sourcecode and executable program dir
 	SubmitWorkPath := utils.GetSubmitWorkPath(compiler.SubmitId)
-	err := os.MkdirAll(SubmitWorkPath, 0744)
+	err := os.MkdirAll(SubmitWorkPath, os.FileMode(0755))
 	if err != nil {
-		log.Printf("Create SubmitWorkPath failed: %v", err)
+		log.Printf("create SubmitWorkPath failed: %v", err)
 		return err
 	}
 	err = os.Chdir(SubmitWorkPath)
 	if err != nil {
-		log.Printf("Chdir failed: %v", err)
+		log.Printf("chdir failed: %v", err)
 		return err
 	}
-	f, err := os.Create(CompleteSourceCodeName)
+	code, err := os.Create(CompleteSourceCodeName)
+	defer code.Close()
 	if err != nil {
-		log.Printf("Create SourceCode failed: %v", err)
+		log.Printf("create SourceCode failed: %v", err)
 		return err
 	}
-	_, err = f.Write([]byte(compiler.UserCode))
+	_, err = code.Write([]byte(compiler.UserCode))
 	if err != nil {
-		log.Printf("Write SourceCode failed: %v", err)
+		log.Printf("write SourceCode failed: %v", err)
+		return err
+	}
+	outdata, err := os.Create("out.data")
+	if err != nil {
+		log.Printf("create out.data failed: %v", err)
+		return err
+	}
+	err = outdata.Chmod(os.FileMode(0666))
+	if err != nil {
+		log.Printf("chmod out.data failed: %v", err)
 		return err
 	}
 	return nil
@@ -54,7 +65,7 @@ func (compiler *Compiler) Compile() (successful bool) {
 	CompileArg := LanguageToCompileArgs[compiler.Language]
 	CompleteSourceCodeName := utils.GetCompleteSourceCodeName(compiler.SubmitId, compiler.Language)
 	CompleteCompileArg := CompileArg + " " + conf.GeneratedProgramName + " " + CompleteSourceCodeName
-	err := compiler.createSourceCodeFile(CompleteSourceCodeName)
+	err := compiler.createSourceCodeFileAndOutDataFile(CompleteSourceCodeName)
 	if err != nil {
 		log.Printf("CreateSourceCodeFile happend error: %v", err)
 		return false

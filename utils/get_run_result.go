@@ -41,6 +41,7 @@ func GetError(stderr string) (res int32) {
 		res = common.ServerInternalError
 		return
 	}
+	log.Printf("Run Errcode %d", ErrCode)
 	if ErrCode == 6 || ErrCode == 10 {
 		res = common.RE
 	} else if ErrCode == 7 {

@@ -1,18 +1,18 @@
 #pragma once
 static short ncalls[512] = {
-	100, /*0, restart_syscall*/
-	3, /*1, exit*/
-	100, /*2, fork*/
-	100, /*3, read*/
-	100, /*4, write*/
-	100, /*5, open*/
+	1, /*0, restart_syscall*/
+	1, /*1, exit*/
+	1, /*2, fork*/
+	1, /*3, read*/
+	1, /*4, write*/
+	1, /*5, open*/
 	0, /*6, close*/
 	0, /*7, waitpid*/
 	1, /*8, creat*/
-	40, /*9, link*/
-	20, /*10, unlink*/
-	10, /*11, execve*/
-	5, /*12, chdir*/
+	1, /*9, link*/
+	1, /*10, unlink*/
+	1, /*11, execve*/
+	1, /*12, chdir*/
 	0, /*13, time*/
 	1, /*14, mknod*/
 	1, /*15, chmod*/
@@ -21,7 +21,7 @@ static short ncalls[512] = {
 	1, /*18, oldstat*/
 	0, /*19, lseek*/
 	0, /*20, getpid*/
-	4, /*21, mount*/
+	1, /*21, mount*/
 	1, /*22, umount*/
 	0, /*23, setuid*/
 	0, /*24, getuid*/

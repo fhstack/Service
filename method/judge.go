@@ -16,6 +16,7 @@ func (server *Server) Judge(c context.Context, req *pb_gen.JudgeRequest) (*pb_ge
 	//construct a compiler
 	cmpl := ctorOneCompiler(req)
 	resp := &pb_gen.JudgeResponse{}
+	callBackUrl := req.GetCallBackUrl()
 	if res := cmpl.Compile(); res == false {
 		resp.ResCode = common.CE
 		resp.CompileInfo = cmpl.CompileInfo
@@ -28,32 +29,31 @@ func (server *Server) Judge(c context.Context, req *pb_gen.JudgeRequest) (*pb_ge
 	OutDataFilePath := utils.GetOutDataFilePath(req.SubmitId)
 	command := fmt.Sprintf("%s %s %s %s", conf.RunPath, UserExecutableFilePath, InDataFilePath, OutDataFilePath)
 
-	stdout, stderr, err := utils.Exec(command)
+	//err is useless
+	stdout, stderr, _ := utils.Exec(command)
 	log.Println("Exec UserExecutableFile program is ok")
 	log.Printf("***********stderr**********\n%s", stderr)
 	log.Printf("***********stdout**********\n%s", stdout)
 	ErrType := utils.GetError(stderr)
 	if ErrType != common.AC {
-		switch req.CallBackUrl == "" {
+		switch callBackUrl == "" {
 		case true:
 			resp.ResCode = ErrType
 			return resp, nil
 		case false:
-			resp.ResCode = common.AlreadyCallBack
-			//callback
+			utils.Callback(callBackUrl, resp)
 			return resp, nil
 		}
 	}
 	log.Println("GetError from stderr is ok")
 	if stdout == "" {
 		//shouldn't happen this, just for safe
-		switch req.CallBackUrl == "" {
+		switch callBackUrl == "" {
 		case true:
 			resp.ResCode = common.ServerInternalError
 			return resp, nil
 		case false:
-			//callback
-			resp.ResCode = common.AlreadyCallBack
+			utils.Callback(callBackUrl, resp)
 			return resp, nil
 		}
 	}
@@ -66,8 +66,7 @@ func (server *Server) Judge(c context.Context, req *pb_gen.JudgeRequest) (*pb_ge
 			resp.ResCode = common.ServerInternalError
 			return resp, nil
 		case false:
-			//callback
-			resp.ResCode = common.AlreadyCallBack
+			utils.Callback(callBackUrl, resp)
 			return resp, nil
 		}
 		return resp, nil
@@ -81,8 +80,7 @@ func (server *Server) Judge(c context.Context, req *pb_gen.JudgeRequest) (*pb_ge
 			resp.ResCode = common.ML
 			return resp, nil
 		case false:
-			//callback
-			resp.ResCode = common.AlreadyCallBack
+			utils.Callback(callBackUrl, resp)
 			return resp, nil
 		}
 	}
@@ -93,7 +91,7 @@ func (server *Server) Judge(c context.Context, req *pb_gen.JudgeRequest) (*pb_ge
 			return resp, nil
 		case false:
 			//callback
-			resp.ResCode = common.AlreadyCallBack
+			utils.Callback(callBackUrl, resp)
 			return resp, nil
 		}
 	}
@@ -112,8 +110,7 @@ func (server *Server) Judge(c context.Context, req *pb_gen.JudgeRequest) (*pb_ge
 	case true:
 		return resp, nil
 	case false:
-		//callback
-		resp.ResCode = common.AlreadyCallBack
+		utils.Callback(callBackUrl, resp)
 		return resp, nil
 	}
 	return resp, nil
