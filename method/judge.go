@@ -28,7 +28,7 @@ func (server *Server) Judge(c context.Context, req *pb_gen.JudgeRequest) (*pb_ge
 	InDataFilePath := utils.GetInDataFilePath(req.ProblemId)
 	OutDataFilePath := utils.GetOutDataFilePath(req.SubmitId)
 	command := fmt.Sprintf("%s %s %s %s", conf.RunPath, UserExecutableFilePath, InDataFilePath, OutDataFilePath)
-
+	log.Println(command)
 	//err is useless
 	stdout, stderr, _ := utils.Exec(command)
 	log.Println("Exec UserExecutableFile program is ok")

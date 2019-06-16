@@ -1,10 +1,6 @@
 package conf
 
 const (
-	RpcPort string = ":9999"
-)
-
-const (
 	SourceCodeName       string = "SourceCode"
 	UserSubmitHome       string = "/home/judge/submit/"
 	ProblemDataHome      string = "/home/judge/problem/"
